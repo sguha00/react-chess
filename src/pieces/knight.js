@@ -6,14 +6,10 @@ export default class Knight extends Piece {
   }
 
   isMovePossible(src, dest){
-    return (src - 17 === dest || 
-      src - 10 === dest || 
-      src + 6 === dest || 
-      src + 15 === dest || 
-      src - 15 === dest || 
-      src - 6 === dest || 
-      src + 10 === dest || 
-      src + 17 === dest);
+    let rowDiff = Math.abs(Math.floor(src / 8) - Math.floor(dest / 8));
+    let colDiff = Math.abs(src % 8 - dest % 8);
+
+    return rowDiff + colDiff === 3 && Math.abs(rowDiff - colDiff) === 1
   }
 
   /**

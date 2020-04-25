@@ -6,7 +6,10 @@ export default class Bishop extends Piece {
   }
 
   isMovePossible(src, dest){
-    return (Math.abs(src - dest) % 9 === 0 || Math.abs(src - dest) % 7 === 0);
+    let rowDiff = Math.abs(Math.floor(src / 8) - Math.floor(dest / 8));
+    let colDiff = Math.abs(src % 8 - dest % 8);
+
+    return rowDiff === colDiff;
   }
 
   /**

@@ -4,6 +4,8 @@ import '../index.css';
 import Board from './board.js';
 import FallenSoldierBlock from './fallen-soldier-block.js';
 import initialiseChessBoard from '../helpers/board-initialiser.js';
+import King from '../pieces/king';
+import { getNodeText } from '@testing-library/react';
 
 export default class Game extends React.Component {
   constructor(){
@@ -15,7 +17,8 @@ export default class Game extends React.Component {
       player: 1,
       sourceSelection: -1,
       status: '',
-      turn: 'white'
+      turn: 'white',
+      check: false,
     }
   }
  
@@ -69,14 +72,26 @@ export default class Game extends React.Component {
           squares[this.state.sourceSelection] = null;
           let player = this.state.player === 1? 2: 1;
           let turn = this.state.turn === 'white'? 'black' : 'white';
+
+          // check if this player is under check
+          if (this.isCheck(this.state.player, squares)) {
+            this.setState({
+              status: "Invalid move - your king would be under check!",
+              sourceSelection: -1,
+            });
+            return;
+          }
+
+          let check = this.isCheck(player, squares)
           this.setState({
             sourceSelection: -1,
             squares: squares,
             whiteFallenSoldiers: whiteFallenSoldiers,
             blackFallenSoldiers: blackFallenSoldiers,
             player: player,
-            status: '',
-            turn: turn
+            status: check ? "Check!" : '',
+            turn: turn,
+            check: check,
           });
         }
         else{
@@ -95,14 +110,41 @@ export default class Game extends React.Component {
    * @param  {[type]}  srcToDestPath [array of board indices comprising path between src and dest ]
    * @return {Boolean}               
    */
-  isMoveLegal(srcToDestPath){
-    let isLegal = true;
+  isMoveLegal(srcToDestPath, squares = null){
+    console.log("srcToDestPath", srcToDestPath);
     for(let i = 0; i < srcToDestPath.length; i++){
-      if(this.state.squares[srcToDestPath[i]] !== null){
-        isLegal = false;
+      if((squares || this.state.squares)[srcToDestPath[i]] !== null){
+        console.log("i", this.state.squares, srcToDestPath[i]);
+        return false;
       }
     }
-    return isLegal;
+    return true;
+  }
+
+  isCheck(player, squares) {
+    console.log(squares);
+    let playerKing;
+    let pieces = [];
+    for (let i = 0; i < squares.length; i++) {
+      if (!squares[i]) continue;
+      if (squares[i].player === player && squares[i] instanceof King) {
+        playerKing = i;
+      } else if (squares[i].player !== player) {
+        pieces.push(i);
+      }
+    }
+    console.log("king", playerKing, pieces);
+    for (let i = 0; i < pieces.length; i++) {
+      let position = pieces[i];
+      if (
+        squares[position].isMovePossible(position, playerKing, true) &&
+        this.isMoveLegal(squares[position].getSrcToDestPath(position, playerKing), squares)
+      ) {
+        console.log("CHECK from ", position, squares[position]);
+        return true;
+      }
+    }
+    return false;
   }
 
   render() {

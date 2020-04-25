@@ -6,9 +6,10 @@ export default class Rook extends Piece {
   }
 
   isMovePossible(src, dest){
-    let mod = src % 8;
-    let diff = 8 - mod;
-    return (Math.abs(src - dest) % 8 === 0 || (dest >= (src - mod) && dest < (src + diff)));
+    let rowDiff = Math.abs(Math.floor(src / 8) - Math.floor(dest / 8));
+    let colDiff = Math.abs(src % 8 - dest % 8);
+
+    return (colDiff === 0 || rowDiff === 0);
   }
 
   /**

@@ -1,4 +1,6 @@
 import Piece from './piece.js';
+import Bishop from './bishop.js';
+import Rook from './rook.js';
 
 export default class Queen extends Piece {
   constructor(player){
@@ -6,11 +8,9 @@ export default class Queen extends Piece {
   }
 
   isMovePossible(src, dest){
-    let mod = src % 8;
-    let diff = 8 - mod;
-    
-    return (Math.abs(src - dest) % 9 === 0 || Math.abs(src - dest) % 7 === 0) ||
-      (Math.abs(src - dest) % 8 === 0 || (dest >= (src - mod) && dest < (src + diff)));
+    let b = new Bishop(this.player);
+    let r = new Rook(this.player);
+    return b.isMovePossible(src, dest) || r.isMovePossible(src, dest);
   }
 
   /**
