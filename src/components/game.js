@@ -5,21 +5,72 @@ import Board from './board.js';
 import FallenSoldierBlock from './fallen-soldier-block.js';
 import initialiseChessBoard from '../helpers/board-initialiser.js';
 import King from '../pieces/king';
-import { getNodeText } from '@testing-library/react';
+import pieceReviver from '../pieces/reviver';
+
+const COLORS = ['white', 'black'];
 
 export default class Game extends React.Component {
+  state = {
+    squares: initialiseChessBoard(),
+    whiteFallenSoldiers: [],
+    blackFallenSoldiers: [],
+    player: 1,
+    sourceSelection: -1,
+    status: '',
+    turn: 0,
+    check: false,
+    member: {},
+  };
+
   constructor(){
     super();
-    this.state = {
-      squares: initialiseChessBoard(),
-      whiteFallenSoldiers: [],
-      blackFallenSoldiers: [],
-      player: 1,
-      sourceSelection: -1,
-      status: '',
-      turn: 'white',
-      check: false,
-    }
+    this.roomName = `observable-${window.location.pathname}`;
+
+    this.drone = new window.Scaledrone("dJEZ1K9ffgeALzCw", {
+      data: this.state.member
+    });
+    this.drone.on('open', error => {
+      console.log("OPENED");
+      if (error) {
+        return console.error(error);
+      }
+      const member = {...this.state.member};
+      member.id = this.drone.clientId;
+      this.setState({member});
+    });
+    const room = this.drone.subscribe(this.roomName);
+    room.on('data', ({squares, ...data}, member) => {
+      if(member.id !== this.state.member.id) {
+        const squareObjs = squares.map(pieceReviver);
+        
+        this.setState({
+          squares: squareObjs,
+          ...data
+        });
+      }
+    });
+    room.on('member_join', (member) => {
+      console.log("MEMBER JOINED", member.id);
+      this.setState({status: 'Your opponent joined the game!'});
+
+      this.publish(this.state);
+    });
+    room.on('members', (members) => {
+      console.log("MEMBERS", members);
+
+    });
+    room.on('member_leave', (member) => {
+      console.log('left member', member.id);
+      this.setState({status: 'Your opponent left the game'});
+    });
+  }
+
+  publish = ({status, member, ...message}) => {
+    console.log("OUTGOING", JSON.stringify(message));
+    this.drone.publish({
+      room: this.roomName,
+      message,
+    });
   }
  
   handleClick(i){
@@ -71,7 +122,7 @@ export default class Game extends React.Component {
           squares[i] = squares[this.state.sourceSelection];
           squares[this.state.sourceSelection] = null;
           let player = this.state.player === 1? 2: 1;
-          let turn = this.state.turn === 'white'? 'black' : 'white';
+          let turn = 1 - this.state.turn;
 
           // check if this player is under check
           if (this.isCheck(this.state.player, squares)) {
@@ -83,7 +134,7 @@ export default class Game extends React.Component {
           }
 
           let check = this.isCheck(player, squares)
-          this.setState({
+          let nextState = {
             sourceSelection: -1,
             squares: squares,
             whiteFallenSoldiers: whiteFallenSoldiers,
@@ -92,7 +143,9 @@ export default class Game extends React.Component {
             status: check ? "Check!" : '',
             turn: turn,
             check: check,
-          });
+          };
+          this.setState(nextState);
+          this.publish(nextState);
         }
         else{
           this.setState({
@@ -133,7 +186,6 @@ export default class Game extends React.Component {
         pieces.push(i);
       }
     }
-    console.log("king", playerKing, pieces);
     for (let i = 0; i < pieces.length; i++) {
       let position = pieces[i];
       if (
@@ -160,7 +212,7 @@ export default class Game extends React.Component {
           </div>
           <div className="game-info">
             <h3>Turn</h3>
-            <div id="player-turn-box" style={{backgroundColor: this.state.turn}}>
+            <div id="player-turn-box" style={{backgroundColor: COLORS[this.state.turn]}}>
   
             </div>
             <div className="game-status">{this.state.status}</div>
