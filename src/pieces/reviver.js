@@ -8,5 +8,6 @@ import Queen from './queen';
 const PIECE_CLASSES = {King, Rook, Knight, Bishop, Pawn, Queen};
 
 export default function reviver(value) {
+  debugger
   return value ? new PIECE_CLASSES[value._class](value.player) : null;
 }

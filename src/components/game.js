@@ -39,6 +39,7 @@ export default class Game extends React.Component {
     const room = this.drone.subscribe(this.roomName);
     room.on('data', ({squares, ...data}, member) => {
       if(member.id !== this.member.id) {
+        console.log("SQUARES", squares);
         const squareObjs = squares.map(pieceReviver);
         
         this.setState({
@@ -65,6 +66,7 @@ export default class Game extends React.Component {
   }
 
   publish = ({status, member, ...message}) => {
+    console.log("OUTGOING", message.squares);
     this.drone.publish({
       room: this.roomName,
       message,

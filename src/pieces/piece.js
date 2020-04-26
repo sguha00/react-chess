@@ -5,6 +5,7 @@ export default class Piece {
   }
 
   toJSON() {
+    debugger
     return {
       player: this.player,
       style: this.style,
