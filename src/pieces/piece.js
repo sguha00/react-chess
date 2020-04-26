@@ -1,15 +1,15 @@
 export default class Piece {
-  constructor(player, iconUrl) {
+  constructor(type, player, iconUrl) {
     this.player = player;
-    this.style = { backgroundImage: `url('${iconUrl}')` }
+    this.style = { backgroundImage: `url('${iconUrl}')` };
+    this.type = type;
   }
 
   toJSON() {
-    debugger
     return {
       player: this.player,
       style: this.style,
-      _class: this.constructor.name,
+      type: this.type,
     }
   }
 }
