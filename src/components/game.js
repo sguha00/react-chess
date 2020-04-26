@@ -14,7 +14,7 @@ export default class Game extends React.Component {
     squares: initialiseChessBoard(),
     whiteFallenSoldiers: [],
     blackFallenSoldiers: [],
-    player: 1,
+    player: 0,
     sourceSelection: -1,
     status: '',
     turn: 0,
@@ -25,22 +25,20 @@ export default class Game extends React.Component {
   constructor(){
     super();
     this.roomName = `observable-${window.location.pathname}`;
-
+    this.member = {};
     this.drone = new window.Scaledrone("dJEZ1K9ffgeALzCw", {
-      data: this.state.member
+      data: this.member,
     });
-    this.drone.on('open', error => {
+    this.drone.on('open', (error) => {
       console.log("OPENED");
       if (error) {
         return console.error(error);
       }
-      const member = {...this.state.member};
-      member.id = this.drone.clientId;
-      this.setState({member});
+      this.member.id = this.drone.clientId;
     });
     const room = this.drone.subscribe(this.roomName);
     room.on('data', ({squares, ...data}, member) => {
-      if(member.id !== this.state.member.id) {
+      if(member.id !== this.member.id) {
         const squareObjs = squares.map(pieceReviver);
         
         this.setState({
@@ -52,12 +50,13 @@ export default class Game extends React.Component {
     room.on('member_join', (member) => {
       console.log("MEMBER JOINED", member.id);
       this.setState({status: 'Your opponent joined the game!'});
+      this.member.player = 0
 
       this.publish(this.state);
     });
     room.on('members', (members) => {
       console.log("MEMBERS", members);
-
+      this.member.player = members.length - 1;
     });
     room.on('member_leave', (member) => {
       console.log('left member', member.id);
@@ -66,7 +65,6 @@ export default class Game extends React.Component {
   }
 
   publish = ({status, member, ...message}) => {
-    console.log("OUTGOING", JSON.stringify(message));
     this.drone.publish({
       room: this.roomName,
       message,
@@ -74,8 +72,14 @@ export default class Game extends React.Component {
   }
  
   handleClick(i){
+    console.log("YOU ARE", this.member.player);
     const squares = this.state.squares.slice();
     
+    if (this.state.turn !== this.member.player) {
+      this.setState({status: "It's not your turn"});
+      return;
+    }
+
     if(this.state.sourceSelection === -1){
       if(!squares[i] || squares[i].player !== this.state.player){
         this.setState({status: "Wrong selection. Choose player " + this.state.player + " pieces."});
@@ -112,7 +116,7 @@ export default class Game extends React.Component {
 
         if(isMovePossible && isMoveLegal){
           if(squares[i] !== null){
-            if(squares[i].player === 1){
+            if(squares[i].player === 0){
               whiteFallenSoldiers.push(squares[i]);
             }
             else{
@@ -121,7 +125,7 @@ export default class Game extends React.Component {
           }
           squares[i] = squares[this.state.sourceSelection];
           squares[this.state.sourceSelection] = null;
-          let player = this.state.player === 1? 2: 1;
+          let player = 1 - this.state.player;
           let turn = 1 - this.state.turn;
 
           // check if this player is under check
