@@ -44,6 +44,7 @@ export default class Game extends React.Component {
         
         this.setState({
           squares: squareObjs,
+          status: '',
           ...data
         });
       }
