@@ -34,7 +34,7 @@ body {
   width: 100%;
   background: url('./images/chess.png');
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
 }
 
