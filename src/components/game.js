@@ -30,46 +30,6 @@ export default class Game extends React.Component {
     super();
     this.whiteVideo = React.createRef();
     this.blackVideo = React.createRef();
-    // this.roomName = `observable-${window.location.pathname}`;
-    // this.member = {};
-    // this.drone = new window.Scaledrone("dJEZ1K9ffgeALzCw", {
-    //   data: this.member,
-    // });
-    // this.drone.on('open', (error) => {
-    //   console.log("OPENED");
-    //   if (error) {
-    //     return console.error(error);
-    //   }
-    //   this.member.id = this.drone.clientId;
-    // });
-    // const room = this.drone.subscribe(this.roomName);
-    // room.on('data', ({squares, ...data}, member) => {
-    //   if(member.id !== this.member.id) {
-    //     console.log("SQUARES", squares);
-    //     const squareObjs = squares.map(pieceReviver);
-        
-    //     this.setState({
-    //       squares: squareObjs,
-    //       status: '',
-    //       ...data
-    //     });
-    //   }
-    // });
-    // room.on('member_join', (member) => {
-    //   console.log("MEMBER JOINED", member.id);
-    //   this.setState({status: 'Your opponent joined the game!'});
-    //   this.member.player = 0
-
-    //   this.publish(this.state);
-    // });
-    // room.on('members', (members) => {
-    //   console.log("MEMBERS", members);
-    //   this.member.player = members.length - 1;
-    // });
-    // room.on('member_leave', (member) => {
-    //   console.log('left member', member.id);
-    //   this.setState({status: 'Your opponent left the game'});
-    // });
   }
 
   componentDidMount() {

@@ -13,7 +13,7 @@ export default class Rtc extends React.Component {
     dataChannel: null,
   };
 
-  constructor() {
+  constructor({ match }) {
     super();
     this.member = {};
     this.drone = new window.Scaledrone("dJEZ1K9ffgeALzCw", {
@@ -26,7 +26,8 @@ export default class Rtc extends React.Component {
       }
       this.member.id = this.drone.clientId;
     });
-    this.roomName = `observable-${window.location.pathname}`;
+    this.roomName = `observable-${match.params.id}`;
+    console.log("ROOMNAME", this.roomName);
     this.room = this.drone.subscribe(this.roomName);
     console.log("SUBSCRIBING", this.roomName);
     // room.on('data', ({squares, ...data}, member) => {
@@ -168,7 +169,8 @@ export default class Rtc extends React.Component {
   }
 
   render() {
-    return this.props.render({
+    const { render } = this.props;
+    return render({
       player: this.state.player,
       localStream: this.state.localStream,
       remoteStream: this.state.remoteStream,
