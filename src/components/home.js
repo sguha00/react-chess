@@ -24,7 +24,7 @@ export default function Home() {
       {showDialog &&
         <Modal show={showDialog} onHide={handleClose}>
           <Modal.Header closeButton>
-            Your game
+            Share this URL with your opponent
           </Modal.Header>
           <Modal.Body>{gameUrl}</Modal.Body>
           <Modal.Footer>
