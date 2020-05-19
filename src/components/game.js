@@ -66,7 +66,12 @@ export default class Game extends React.Component {
     console.log("YOU ARE", this.props.player);
     const squares = this.state.squares.slice();
     
-    if (this.state.turn !== this.props.player || this.props.connectionStatus !== 'connected') {
+    if (this.props.connectionStatus !== 'connected') {
+      this.setState({status: "Waiting for opponent"});
+      return;
+    }
+
+    if (this.state.turn !== this.props.player) {
       this.setState({status: "It's not your turn"});
       return;
     }
