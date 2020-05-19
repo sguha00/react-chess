@@ -67,7 +67,7 @@ export default class Game extends React.Component {
     const squares = this.state.squares.slice();
     
     if (this.props.connectionStatus !== 'connected') {
-      this.setState({status: "Waiting for opponent"});
+      this.setState({status: "Please wait for opponent"});
       return;
     }
 
