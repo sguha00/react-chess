@@ -133,11 +133,27 @@ video {
   width: 200px;
   height: 150px;
   margin-right: 10px;
-  border: 4px solid transparent;
+  outline: 4px solid transparent;
 }
 
 video.selected {
-  border-color: deepskyblue;
+  outline-color: deepskyblue;
+  animation: outlinepulse 1.5s ease-in infinite;
+}
+
+@keyframes outlinepulse {
+  0% {
+    outline-width: 2px;
+  }
+  70% {
+    outline-width: 7px;
+    outline-color: transparent;
+  }
+
+  100% {
+    outline-width: 4px;
+    outline-color: transparent;
+  }
 }
 
 .video-container .connection-status {
